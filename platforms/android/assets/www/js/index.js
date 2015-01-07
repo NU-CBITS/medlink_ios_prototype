@@ -33,7 +33,16 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
-        app.receivedEvent('deviceready');
+     window.plugin.notification.local.promptForPermission();
+	window.plugin.notification.local.add({
+  		id: 1,
+  		date: new Date(new Date().getTime() + 60*1000),
+  		badge: 3,
+  		message: 'ello 58',
+  		title: 'testing local notifications',
+  		repeat: 'minutely',
+	});
+	   app.receivedEvent('deviceready');
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {

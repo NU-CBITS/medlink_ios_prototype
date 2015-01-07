@@ -26,7 +26,7 @@ module.exports.metadata =
 // TOP OF METADATA
 {
     "com.hutchind.cordova.plugins.launcher": "0.2.0",
-    "de.appplant.cordova.plugin.local-notification": "0.7.6",
+    "de.appplant.cordova.plugin.local-notification": "0.8.0dev",
     "org.apache.cordova.device": "0.2.14-dev"
 }
 // BOTTOM OF METADATA

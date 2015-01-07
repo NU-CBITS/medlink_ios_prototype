@@ -33,7 +33,9 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
-     window.plugin.notification.local.promptForPermission();
+    window.plugin.notification.local.registerPermission(function (granted) {
+    // console.log('Permission has been granted: ' + granted);
+	});
 	window.plugin.notification.local.add({
   		id: 1,
   		date: new Date(new Date().getTime() + 60*1000),
