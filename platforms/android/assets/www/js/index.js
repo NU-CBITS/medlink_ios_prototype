@@ -37,10 +37,10 @@ var app = {
 	window.plugin.notification.local.add({
   		id: 1,
   		date: new Date(new Date().getTime() + 60*1000),
-  		badge: 3,
-  		message: 'ello 58',
-  		title: 'testing local notifications',
-  		repeat: 'minutely',
+  		badge: 1,
+  		message: 'Update Medlink',
+  		title: 'Let us know about your medications.',
+  		repeat: '',
 	});
 	   app.receivedEvent('deviceready');
     },

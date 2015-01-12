@@ -37,8 +37,8 @@
 // Retrieves a list of ids from all currently pending notifications
 - (void) getScheduledIds:(CDVInvokedUrlCommand*)command;
 // Informs if the app has the permission to show notifications
-- (void) hasPermission:(CDVInvokedUrlCommand*)command;
-// Registers permission to show notifications
-- (void) registerPermission:(CDVInvokedUrlCommand*)command;
+- (void) hasPermission:(CDVInvokedUrlCommand *)command;
+// Ask for permission to show notifications
+- (void) promptForPermission:(CDVInvokedUrlCommand *)command;
 
 @end

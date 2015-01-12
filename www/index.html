@@ -39,5 +39,18 @@
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
 
+	<script type="text/javascript">
+
+		// check if purple robot is installed
+		window.plugins.launcher.canLaunch({packageName:'edu.northwestern.cbits.purple_robot_manager'}, successCallback, errorCallback);
+
+		//launch PR via package ID
+		window.plugins.launcher.launch({packageName:'edu.northwestern.cbits.purple_robot_manager'}, successCallback, errorCallback);
+
+	</script>
+
+
+
+
     </body>
 </html>
