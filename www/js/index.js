@@ -27,7 +27,8 @@ var app = {
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
-    },
+    	document.addEventLister('click', this.launchFollowUpNote, false);
+	},
     // deviceready Event Handler
     //
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
@@ -38,12 +39,27 @@ var app = {
   		id: 1,
   		date: new Date(new Date().getTime() + 60*1000),
   		badge: 1,
-  		message: 'Update Medlink',
-  		title: 'Let us know about your medications.',
+  		message: 'Let us know about your medications.',
+  		title: 'Update Medlink.',
   		repeat: '',
 	});
 	   app.receivedEvent('deviceready');
-    },
+    
+	
+      // launch a follow up notification
+        launchFollowUpNote: function() {
+                window.plugin.notification.local.add({
+                id: 2,
+                // three minutes in the future
+                date: new Date(new Date().getTime() + 60*3000),
+                badge: 1,
+                message: 'So did you take your medications?',
+                title: 'Update Medlink.',
+                repeat: '',
+        });
+        }
+	},	
+
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         var parentElement = document.getElementById(id);
