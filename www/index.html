@@ -28,8 +28,6 @@
         <title>Hello World</title>
     </head>
     
-
-    
     <body>
         <div class="app">
             <h1>Apache Cordova</h1>
@@ -38,15 +36,15 @@
                 <p class="event received">Device is Ready</p>
                 
             </div>
-           <button name="testButtonA" onClick="alert('ugh ruth')"">hey ruth</button>
-           <button name="testButtonB" onClick="testFunction()">why who?</button>
+           <button name="testButtonA" onClick="alert('ugh ruth')">hey ruth</button>
+           <button name="testButtonB" onClick="testFunction()">fire note</button>
         </div>
         
         <script type="text/javascript" charset="utf-8">
             
             function testFunction()
             {
-                alert('why ruth');
+                alert('note fired');
                 
                 window.plugin.notification.local.add({
                 id: 2,
