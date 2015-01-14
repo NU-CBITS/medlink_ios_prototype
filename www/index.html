@@ -27,6 +27,9 @@
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>Hello World</title>
     </head>
+    
+
+    
     <body>
         <div class="app">
             <h1>Apache Cordova</h1>
@@ -35,27 +38,31 @@
                 <p class="event received">Device is Ready</p>
                 
             </div>
-            
-            <button onclick="launchFollowUpNote()">remind me</button>
-
-            <script>
-                // launch a follow up notification
-                function launchFollowUpNote() {
-                    window.plugin.notification.local.add({
-                                                         id: 2,
-                                                         // 30 seconds in the future
-                                                         date: new Date(new Date().getTime() + 60*500),
-                                                         badge: 1,
-                                                         message: 'So did you take your medications?',
-                                                         title: 'Update Medlink',
-                                                         repeat: '',
-                                                         });
-                                                         
-                </script>
+           <button name="testButtonA" onClick="alert('ugh ruth')"">hey ruth</button>
+           <button name="testButtonB" onClick="testFunction()">why who?</button>
         </div>
-	<script type="text/javascript" src="js/Launcher.js"></script>
-    <script type="text/javascript" src="cordova.js"></script>
-    <script type="text/javascript" src="js/index.js"></script>
+        
+        <script type="text/javascript" charset="utf-8">
+            
+            function testFunction()
+            {
+                alert('why ruth');
+                
+                window.plugin.notification.local.add({
+                id: 2,
+                date: new Date(new Date().getTime() + 60*1000),
+                badge: 1,
+                message: 'Tell us more about your medications.',
+                title: 'Test from Button Click',
+                repeat: '',
+                });
+            }
+        
+        </script>
+        
+        <script type="text/javascript" src="js/Launcher.js"></script>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
 
     </body>
 </html>
