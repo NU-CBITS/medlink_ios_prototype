@@ -33,24 +33,28 @@
             <div id="deviceready" class="blink">
                 <p class="event listening">Connecting to Device</p>
                 <p class="event received">Device is Ready</p>
+                
             </div>
+            <script>
+                // launch a follow up notification
+                function launchFollowUpNote() {
+                    window.plugin.notification.local.add({
+                                                         id: 2,
+                                                         // 30 seconds in the future
+                                                         date: new Date(new Date().getTime() + 60*500),
+                                                         badge: 1,
+                                                         message: 'So did you take your medications?',
+                                                         title: 'Update Medlink',
+                                                         repeat: '',
+                                                         });
+                                                         
+                </script>
+            
+            <button onclick="launchFollowUpNote()">remind me</button>
         </div>
 	<script type="text/javascript" src="js/Launcher.js"></script>
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-
-	<script type="text/javascript">
-
-		// check if purple robot is installed
-		window.plugins.launcher.canLaunch({packageName:'edu.northwestern.cbits.purple_robot_manager'}, successCallback, errorCallback);
-
-		//launch PR via package ID
-		window.plugins.launcher.launch({packageName:'edu.northwestern.cbits.purple_robot_manager'}, successCallback, errorCallback);
-
-	</script>
-
-
-
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
 
     </body>
 </html>
