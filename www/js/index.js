@@ -32,15 +32,9 @@ var app = {
     //
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
+    
     onDeviceReady: function() {
-     window.plugin.notification.local.promptForPermission();
-        window.plugin.notification.local.add({
-  		id: 1,
-  		date: new Date(new Date().getTime() + 60*1000),
-  		badge: 1,
-  		message: 'Let us know about your medications.',
-  		title: 'Update Medlink',
-  		repeat: '',
+
 	});
 	   app.receivedEvent('deviceready');
 	

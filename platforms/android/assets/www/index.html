@@ -27,34 +27,62 @@
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>Hello World</title>
     </head>
+    
     <body>
         <div class="app">
-            <h1>Apache Cordova</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
                 
-            </div>
-            <script>
-                // launch a follow up notification
-                function launchFollowUpNote() {
-                    window.plugin.notification.local.add({
-                                                         id: 2,
-                                                         // 30 seconds in the future
-                                                         date: new Date(new Date().getTime() + 60*500),
-                                                         badge: 1,
-                                                         message: 'So did you take your medications?',
-                                                         title: 'Update Medlink',
-                                                         repeat: '',
-                                                         });
-                                                         
-                </script>
-            
-            <button onclick="launchFollowUpNote()">remind me</button>
+                <form onSubmit="JavaScript:sendPayload()">
+                    <h3>Did you take your medication today?</h3>
+                    <input type="radio" name="adherence" value="yes"> Yep </br>
+                    <input type="radio" name="adherence" value="no"> Absolutely not </br>
+                    <input type="submit" value="Submit">
+                </form>
+                <br>
+           <button name="testButtonB" onClick="testFunction()">fire note</button>
         </div>
-	<script type="text/javascript" src="js/Launcher.js"></script>
-    <script type="text/javascript" src="cordova.js"></script>
-    <script type="text/javascript" src="js/index.js"></script>
+        
+        <script type="text/javascript" charset="utf-8">
+            
+            function sendPayload(){
+                
+                var form = $(document.myform);
+                var response = JSON.stringify(frm.serializeArray());
+                
+                var data = {participant_id: "tester", prompt: "1a", response: response}
+                
+                $.ajax({
+                       url: http://localhost:3000/reports,
+                       type: 'POST',
+                       contentType:'application/json',
+                       data: data,
+                       dataType:'json'
+                       });
+                       
+                // todo: add callback based on server response
+                
+                alert('thanks for letting us know');
+                
+            }
+            
+            function testFunction()
+            {
+                alert('local note fired');
+                
+                window.plugin.notification.local.add({
+                id: 2,
+                date: new Date(new Date().getTime() + 60*1000),
+                badge: 1,
+                message: 'Tell us more about your medications.',
+                title: 'Test from Button Click',
+                repeat: '',
+                });
+            }
+        
+        </script>
+        
+        <script type="text/javascript" src="js/Launcher.js"></script>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
 
     </body>
 </html>
