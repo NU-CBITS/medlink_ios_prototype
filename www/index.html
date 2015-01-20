@@ -27,10 +27,10 @@
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>Hello World</title>
     </head>
-    
+
     <body>
         <div class="app">
-            
+
                 <form name="q1a" onsubmit="sendPayload()">
                     <h3>Did you take your medication today?</h3>
                     <input type="radio" name="adherence" value="yes"> Yep </br>
@@ -40,41 +40,44 @@
                 <br>
            <button name="testButtonB" onClick="testFunction()">fire note</button>
         </div>
-        
-        <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
-        <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-        
+
+        <script src="js/jquery-1.11.2.js"></script>
+
         <script type="text/javascript" charset="utf-8">
-            
-            $.support.cors=true;
-            
-            function sendPayload()
-            {
-                var form = $(document.q1a);
-                var response = JSON.stringify(form.serializeArray());
-                
-                var data = {"participant_id": "tester", "prompt": 12, "response": "via cordova"};
-                
+
+            function sendPayload()  {
+
+                 var form = $(document.q1a);
+                 var response = JSON.stringify(form.serializeArray());
+
+                // static test payload
+                var sampleData = {
+                              "participant_id": "tester",
+                              "prompt": "12",
+                              "response": response};
+
+                var data = JSON.stringify(sampleData);
+
                 $.ajax({
-                       url: 'http://localhost:3000/reports.json',
-                       type: 'POST',
-                       contentType:'application/json',
-                       data: data,
-                       dataType:'json'
-                       error: function(){ alert('Update failed!'); },
-                       processData: false,
-                       success: function(){ alert('success. thanks for letting us know!');}
-                       })
+                  url: 'http://localhost:3000/reports.json',
+                  type: 'POST',
+                  contentType:'application/json',
+                  data: data,
+
+                  success: function(){
+                      alert('success. thanks for letting us know!');
+                  },
+                 })
             }
-        
+
         </script>
-        
+
         <script type="text/javascript" charset="utf-8">
-            
+
             function testFunction()
             {
                 alert('local note fired');
-                
+
                 window.plugin.notification.local.add({
                 id: 2,
                 date: new Date(new Date().getTime() + 60*1000),
@@ -84,11 +87,13 @@
                 repeat: '',
                 });
             }
-        
+
         </script>
-        
-        <script type="text/javascript" src="js/Launcher.js"></script>
+
+        <!--
         <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="Launcher.js"></script>
+        -->
         <script type="text/javascript" src="js/index.js"></script>
 
     </body>
