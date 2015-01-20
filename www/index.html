@@ -50,7 +50,7 @@
                  var form = $(document.q1a);
                  var response = JSON.stringify(form.serializeArray());
 
-                // static test payload
+                // semi-static test payload
                 var sampleData = {
                               "participant_id": "tester",
                               "prompt": "12",
@@ -64,6 +64,7 @@
                   contentType:'application/json',
                   data: data,
 
+                  // todo replace with promise interface
                   success: function(){
                       alert('success. thanks for letting us know!');
                   },
