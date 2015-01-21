@@ -38,7 +38,10 @@
                     <input type="submit" value="Submit">
                 </form>
                 <br>
-           <button name="testButtonB" onClick="testFunction()">fire note</button>
+
+           <button name="testButtonB" onClick="testLocalNote()">fire note</button>
+           <button name="testButtonC" onClick="resendPayload('someUniqueItem')">send local data</button>
+
         </div>
 
         <script src="js/jquery-1.11.2.js"></script>
@@ -50,32 +53,49 @@
                  var form = $(document.q1a);
                  var response = JSON.stringify(form.serializeArray());
 
-                // semi-static test payload
-                var sampleData = {
-                              "participant_id": "tester",
-                              "prompt": "12",
-                              "response": response};
+                 // semi-static test payload
+                 var sampleData = {
+                   "participant_id": "tester",
+                   "prompt": "12",
+                   "response": response};
 
                 var data = JSON.stringify(sampleData);
 
-                $.ajax({
-                  url: 'http://localhost:3000/reports.json',
-                  type: 'POST',
-                  contentType:'application/json',
-                  data: data,
+                 var report = $.ajax({
+                   url: 'http://localhost:3000/reports.json',
+                   type: 'POST',
+                   contentType:'application/json',
+                   data: data,
 
-                  // todo replace with promise interface
-                  success: function(){
-                      alert('success. thanks for letting us know!');
-                  },
-                 })
-            }
+                   // todo replace with promise
+                   success: function(){
+
+                     console.log(tag + 'payload sent');
+
+                     // alert("thanks for letting us know!");
+                   },
+
+                 error: function(){
+
+                   // add payload to local storage to post later
+                   // better this be a promise
+
+                   window.localStorage.setItem('someUniqueTag', data);
+
+                 },
+
+                 });
+
+              }
 
         </script>
 
         <script type="text/javascript" charset="utf-8">
 
-            function testFunction()
+            // uses the local notification plugin to schedule a local note
+            // date param schedules time in the future to fire
+
+            function testLocalNote()
             {
                 alert('local note fired');
 
@@ -88,6 +108,52 @@
                 repeat: '',
                 });
             }
+
+        </script>
+
+        <script type="text/javascript">
+
+          // todo: generalize to all items in local storage
+          function resendPayload(){
+
+            // replace in generalized fn
+            var tag = 'someUniqueTag';
+
+            storedItemTag = tag.toString();
+
+            console.log(storedItemTag);
+
+            // retrieve local storage item
+            var storedPayload = window.localStorage.getItem(storedItemTag);
+
+            console.log(storedPayload.toString());
+
+            // attempt to send item to the server
+
+            var resend = $.ajax({
+              url: 'http://localhost:3000/reports.json',
+              type: 'POST',
+              contentType:'application/json',
+              data: storedPayload,
+
+              // todo replace with promise
+              success: function(){
+
+                // remove stored item from localstorage
+                window.localStorage.removeItem(storedItemTag);
+
+              },
+
+            error: function(){
+
+              // item remains in local storage for next attempt
+              console.log( tag + 'still not posted to server');
+
+            },
+
+          });
+        }
+
 
         </script>
 
