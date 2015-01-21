@@ -40,7 +40,7 @@
                 <br>
 
            <button name="testButtonB" onClick="testLocalNote()">fire note</button>
-           <button name="testButtonC" onClick="resendPayload('someUniqueItem')">send local data</button>
+           <button name="testButtonC" onClick="resendPayloads()">send local data</button>
 
         </div>
 
@@ -68,19 +68,25 @@
                    data: data,
 
                    // todo replace with promise
+                   // currently success isn't getting registered even tho payload
+                   // is stored on server
                    success: function(){
 
-                     console.log(tag + 'payload sent');
+                      alert("thanks for letting us know!");
 
-                     // alert("thanks for letting us know!");
                    },
-
-                 error: function(){
 
                    // add payload to local storage to post later
                    // better this be a promise
+                   error: function(){
 
-                   window.localStorage.setItem('someUniqueTag', data);
+                     // tag with payload plus some unique tag
+                     // todo decide tagging schema
+                     // probs based on dates
+
+                     uniqueTag = Math.random().toString();
+
+                     window.localStorage.setItem('payload' + uniqueTag , data);
 
                  },
 
@@ -113,45 +119,46 @@
 
         <script type="text/javascript">
 
-          // todo: generalize to all items in local storage
-          function resendPayload(){
+          function resendPayloads(){
 
-            // replace in generalized fn
-            var tag = 'someUniqueTag';
+            // grab each item in local storage
+            // todo: this is only iterating once, on most recent item
+            for (var i in window.localStorage){
 
-            storedItemTag = tag.toString();
+              storedPayload = localStorage.getItem(i);
+              storedItemKey = localStorage.key(i);
 
-            console.log(storedItemTag);
+              // todo: some method for parsing keys in case we are storing other
+              // data in localStorage, only POST items with a payload key
 
-            // retrieve local storage item
-            var storedPayload = window.localStorage.getItem(storedItemTag);
+              console.log(storedPayload.toString());
 
-            console.log(storedPayload.toString());
+              // attempt to send item to the server
 
-            // attempt to send item to the server
+              var resend = $.ajax({
+                url: 'http://localhost:3000/reports.json',
+                type: 'POST',
+                contentType:'application/json',
+                data: storedPayload,
 
-            var resend = $.ajax({
-              url: 'http://localhost:3000/reports.json',
-              type: 'POST',
-              contentType:'application/json',
-              data: storedPayload,
+                // todo replace with promise
+                success: function(){
 
-              // todo replace with promise
-              success: function(){
+                  // remove stored item from localstorage
+                  window.localStorage.removeItem(storedItemKey);
 
-                // remove stored item from localstorage
-                window.localStorage.removeItem(storedItemTag);
+                },
 
-              },
+                error: function(){
 
-            error: function(){
+                  // item remains in local storage for next attempt
+                  console.log( storedItemKey + ' still not posted to server');
 
-              // item remains in local storage for next attempt
-              console.log( tag + 'still not posted to server');
+                },
+              });
 
-            },
+            }
 
-          });
         }
 
 
