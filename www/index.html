@@ -40,7 +40,8 @@
                 <br>
 
            <button name="testButtonB" onClick="testLocalNote()">fire note</button>
-           <button name="testButtonC" onClick="resendPayloads()">send local data</button>
+           <button name="testButtonC" onClick="resendPayloads()">send local data</button></br>
+           <button name="testButtonD" onClick="checkWisepillStatus()">wisepill status</button>
 
         </div>
 
@@ -70,6 +71,68 @@
 
         <script type="text/javascript" charset="utf-8">
 
+          function checkWisepillStatus() {
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth()+1;
+            var yyyy = today.getFullYear();
+
+            if(dd<10) {
+              dd='0'+dd
+            }
+
+            if(mm<10) {
+              mm='0'+mm
+            }
+
+            today = yyyy+'-'+mm+'-'+dd;
+
+              var wisepillCheck = $.ajax({
+                url: "http://localhost:3000/wisepill?id_code=1234",
+                type: 'GET',
+                dataType:'text',
+
+                success: function(data){
+
+                    wisePillData = JSON.parse(data);
+
+                    console.log("wisepill opened? " + wisePillData['wasPillboxOpenedToday'])
+
+                    if (wisePillData['wasPillboxOpenedToday'] == false && wisePillData['today'] == today){
+
+                      alert("wisepill note fired");
+
+                      window.plugin.notification.local.add({
+                        id: 3,
+                        date: new Date(new Date().getTime() + 60*1000),
+                        badge: 1,
+                        message: 'Tell us more about your medications.',
+                        title: 'Based on Wisepill response.',
+                        repeat: '',
+                      });
+
+                    }
+
+                    var now = new Date(new Date().getTime()).toString();
+
+                    wiseDataDateTag = 'wisepill ' + now;
+
+                    window.localStorage.setItem(wiseDataDateTag, wisePillData);
+
+                    },
+
+                    error: function(){
+
+                      console.log('could not get wisepill status');
+                    },
+            });
+          }
+
+      </script>
+
+      <script type="text/javascript" charset="utf-8">
+
         function sendPayload()  {
 
           var form = $(document.q1a);
@@ -97,18 +160,17 @@
               // seems to be part of cors suite of annoyances
               success: function(){
 
-                console.log(status + "ok");
-                alert("thanks for letting us know!");
+                alert("data sent. thanks for letting us know!");
 
               },
 
               // add payload to local storage to post later
               error: function(){
 
-                // tag with payload prefix plus timestamp
                 payloadDateTag = 'payload' + now;
 
                 window.localStorage.setItem(payloadDateTag, medData);
+                alert("we stored your data to send later.");
 
               },
 
@@ -170,13 +232,10 @@
 
         }
 
-
         </script>
 
-        <!--
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="Launcher.js"></script>
-        -->
         <script type="text/javascript" src="js/index.js"></script>
 
     </body>
