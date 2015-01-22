@@ -46,54 +46,6 @@
 
         <script src="js/jquery-1.11.2.js"></script>
 
-        <script type="text/javascript" charset="utf-8">
-
-            function sendPayload()  {
-
-                 var form = $(document.q1a);
-                 var response = JSON.stringify(form.serializeArray());
-
-                 var now = new Date(new Date().getTime()).toString();
-
-                 // semi-static test payload
-                 var sampleData = {
-                   "participant_id": "test - " + now,
-                   "prompt": "12",
-                   "response": response};
-
-                var medData = JSON.stringify(sampleData);
-
-                 var report = $.ajax({
-                   url: 'http://localhost:3000/reports.json',
-                   type: 'POST',
-                   contentType:'application/json',
-                   data: medData,
-
-                   // currently success response isn't getting recieved even tho
-                   // payload is stored on local rails server
-                   // seems to be part of cors suite of annoyances
-                   success: function(){
-
-                      console.log(status + "ok");
-                      alert("thanks for letting us know!");
-
-                   },
-
-                   // add payload to local storage to post later
-                   error: function(){
-
-                     // tag with payload prefix plus timestamp
-                     payloadDateTag = 'payload' + now;
-
-                     window.localStorage.setItem(payloadDateTag, medData);
-
-                 },
-
-                 });
-
-              }
-
-        </script>
 
         <script type="text/javascript" charset="utf-8">
 
@@ -115,6 +67,56 @@
             }
 
         </script>
+
+        <script type="text/javascript" charset="utf-8">
+
+        function sendPayload()  {
+
+          var form = $(document.q1a);
+          var response = JSON.stringify(form.serializeArray());
+
+          var now = new Date(new Date().getTime()).toString();
+
+          // semi-static test payload
+          var sampleData = {
+            "participant_id": "test - " + now,
+            "prompt": "12",
+            "response": response};
+
+            var medData = JSON.stringify(sampleData);
+
+            var report = $.ajax({
+              url: 'http://localhost:3000/reports.json',
+              type: 'POST',
+              contentType:'application/json',
+              data: medData,
+
+              // currently success callback not firing even tho
+              // payload is stored on local rails server
+              // and error response fails to trip
+              // seems to be part of cors suite of annoyances
+              success: function(){
+
+                console.log(status + "ok");
+                alert("thanks for letting us know!");
+
+              },
+
+              // add payload to local storage to post later
+              error: function(){
+
+                // tag with payload prefix plus timestamp
+                payloadDateTag = 'payload' + now;
+
+                window.localStorage.setItem(payloadDateTag, medData);
+
+              },
+
+            });
+
+          }
+
+          </script>
 
         <script type="text/javascript">
 
@@ -161,7 +163,6 @@
                 },
               });
 
-              // remove stored item from localstorage
               // this should get moved into the success fn once i debug
               window.localStorage.removeItem(storedItemKey);
 
