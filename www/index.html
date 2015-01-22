@@ -69,18 +69,10 @@
                    contentType:'application/json',
                    data: medData,
 
-                   statusCode: {
-                     200: function(){
-                       console.log("successful transmission");
-                       alert("thanks for letting us know!");
-                     }
-                   },
-
-                   // todo replace with promise?
                    // currently success response isn't getting recieved even tho
                    // payload is stored on local rails server
                    // seems to be part of cors suite of annoyances
-                   success: function(data, status){
+                   success: function(){
 
                       console.log(status + "ok");
                       alert("thanks for letting us know!");
@@ -93,7 +85,7 @@
                      // tag with payload prefix plus timestamp
                      payloadDateTag = 'payload' + now;
 
-                     window.localStorage.setItem(payloadDateTag, data);
+                     window.localStorage.setItem(payloadDateTag, medData);
 
                  },
 
@@ -160,9 +152,10 @@
 
                   // item placed back in local storage for next attempt
                   // note actual reported timestamp will be in payload itself
+                  var now = new Date(new Date().getTime()).toString();
                   payloadDateTag = 'payload' + now;
 
-                  window.localStorage.setItem(payloadDateTag, data);
+                  window.localStorage.setItem(payloadDateTag, storedPayload);
                   console.log( storedItemKey + ' still not posted to server');
 
                 },
