@@ -3,7 +3,8 @@
   var Prompt = Backbone.Model.extend({
 
     defaults: {
-      "prompt_id": '', // ids correspond to prompt flow diagram
+      "id": '1234',
+      "prompt_id": '', // prompt_ids correspond to prompt flow diagram
       "questionText" : '',
     }
 
@@ -25,18 +26,24 @@
 
   });
 
-  var AdherenceResponse = Backbone.Collection.extend({
+  var AdherenceResponse = Backbone.Model.extend({
 
-    // all prompt responses are grouped into one Adherence Response
-    model: PromptResponse
+    defaults: {
+      "participant_id": "test - " + new Date(new Date().getTime()).toString(),
+      "reponses": '',
+    }
 
+  });
+
+  var ResponseSet = Backbone.Collection.extend({
+    model: AdherenceResponse
   });
 
   var PromptView = Backbone.View.extend({
     el: $('form'),
 
     events: {
-
+      // none yet
     },
 
     initialize: function(){
@@ -111,11 +118,13 @@
 
     postAdherenceResponse: function(){
 
-      // how to grab this id when i create the prompt in a different fn?
-      var prompt_id = this.model.get('prompt_id');
-      // var prompt_id = 'q1a';
-
       var form = $(document.base);
+
+      var currentPrompt = this.collection.get('1234');
+
+      var prompt_id = currentPrompt.get('prompt_id');
+
+      // todo extract just the value, don't send the whole form
       var answer = JSON.stringify(form.serializeArray());
 
       // todo build aherence response hash based on successive prompts
