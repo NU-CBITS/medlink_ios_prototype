@@ -47,7 +47,6 @@
 
         <script src="js/jquery-1.11.2.js"></script>
 
-
         <script type="text/javascript" charset="utf-8">
 
             // uses the local notification plugin to schedule a local note
@@ -73,22 +72,11 @@
 
           function checkWisepillStatus() {
 
-            var today = new Date();
-            var dd = today.getDate();
-            var mm = today.getMonth()+1;
-            var yyyy = today.getFullYear();
-
-            if(dd<10) {
-              dd='0'+dd
-            }
-
-            if(mm<10) {
-              mm='0'+mm
-            }
-
-            today = yyyy+'-'+mm+'-'+dd;
+            var today = getTodayDate();
 
               var wisepillCheck = $.ajax({
+
+                // id_code will be based on user settings
                 url: "http://localhost:3000/wisepill?id_code=1234",
                 type: 'GET',
                 dataType:'text',
@@ -100,6 +88,8 @@
                     console.log("wisepill opened? " + wisePillData['wasPillboxOpenedToday'])
 
                     if (wisePillData['wasPillboxOpenedToday'] == false && wisePillData['today'] == today){
+
+                      // todo handle medication time logic
 
                       alert("wisepill note fired");
 
@@ -114,10 +104,9 @@
 
                     }
 
+                    // i dunno that we even need to store this unless for events
                     var now = new Date(new Date().getTime()).toString();
-
                     wiseDataDateTag = 'wisepill ' + now;
-
                     window.localStorage.setItem(wiseDataDateTag, wisePillData);
 
                     },
@@ -125,8 +114,29 @@
                     error: function(){
 
                       console.log('could not get wisepill status');
+
                     },
             });
+          }
+
+        function getTodayDate() {
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth()+1;
+            var yyyy = today.getFullYear();
+
+            if(dd<10) {
+              dd='0'+dd
+            }
+
+            if(mm<10) {
+              mm='0'+mm
+            }
+
+            today = yyyy+'-'+mm+'-'+dd;
+            return today;
+
           }
 
       </script>
@@ -169,6 +179,8 @@
 
                 payloadDateTag = 'payload' + now;
 
+                // in backbone implementation store these under 'adherence' namespace
+
                 window.localStorage.setItem(payloadDateTag, medData);
                 alert("we stored your data to send later.");
 
@@ -191,8 +203,7 @@
               storedPayload = localStorage.getItem(i);
               storedItemKey = localStorage.key(i);
 
-              // todo: some method for parsing keys in case we are storing other
-              // data in localStorage, only POST items with a payload key
+              // in backbone implementation retrieve these from 'adherence' namespace
 
               console.log(storedPayload.toString());
 
