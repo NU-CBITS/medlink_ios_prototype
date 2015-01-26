@@ -121,11 +121,8 @@
       var form = $(document.base);
 
       var currentPrompt = this.collection.get('1234');
-
       var prompt_id = currentPrompt.get('prompt_id');
-
-      // todo extract just the value, don't send the whole form
-      var answer = JSON.stringify(form.serializeArray());
+      var answer = $( "input:radio:checked" ).val();
 
       // todo build aherence response hash based on successive prompts
       var promptResponse = new PromptResponse();
