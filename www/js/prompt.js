@@ -19,6 +19,7 @@
   var PromptResponse = Backbone.Model.extend({
 
     defaults: {
+      // remove participant id once i collect these into AdherenceResponse
       "participant_id": "test - " + new Date(new Date().getTime()).toString(),
       "prompt_id": '',
       "response": '',
@@ -40,7 +41,7 @@
   });
 
   var PromptView = Backbone.View.extend({
-    el: $('form'),
+    el: $('body'),
 
     events: {
       // none yet
@@ -71,7 +72,7 @@
     },
 
     initialize: function(){
-      _.bindAll(this, 'render', 'postAdherenceResponse', 'showNextPrompt');
+      _.bindAll(this, 'render', 'postAdherenceResponse', 'showNextPrompt', 'fireReminderNote');
 
       this.collection = new PromptSet();
       // this.collection.bind('add', this.appendItem); // collection event binder
@@ -108,11 +109,6 @@
       // and the current prompt id
       // show them the next prompt or
       // give feedback
-
-      prompt.set({
-        prompt_id: 'q2a',
-        questionText: 'Do you plan to take your medication?',
-      });
 
     },
 
@@ -155,15 +151,49 @@
 
           payloadDateTag = 'adherence: ' + new Date(new Date().getTime()).toString();
 
-          // todo store these under 'adherence' namespace
           window.localStorage.setItem(payloadDateTag, adherenceResponse);
           alert("we stored your data to send later.");
 
         },
 
       });
+
+
+      if (answer.toString() === "no") {
+
+          alert('local note fired');
+
+          // comment if not working in cordova
+          /*
+          window.plugin.notification.local.add({
+            id: 2,
+            date: new Date(new Date().getTime() + 60*1000),
+            badge: 1,
+            message: 'Tell us more about your medications.',
+            title: 'Based on response of no',
+            repeat: '',
+          });
+          */
+
+          // want to do this instead:
+          // this.fireReminderNote();
+
+        }
+
     },
 
+    // schedule a reminder notification 1 minutes in the future
+    fireReminderNote: function(){
+
+      window.plugin.notification.local.add({
+        id: 2,
+        date: new Date(new Date().getTime() + 60*1000),
+        badge: 1,
+        message: 'Tell us more about your medications.',
+        title: 'Based on response of no',
+        repeat: '',
+      });
+    },
 
     addPromptResponse: function(){
 

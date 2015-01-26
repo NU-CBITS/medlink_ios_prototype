@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <title>Hello World</title>
+    </head>
+
+    <body>
+        <div class="app">
+
+                <form name="q1a" onsubmit="sendPayload()">
+                    <h3>Did you take your medication today?</h3>
+                    <input type="radio" name="adherence" value="yes"> Yep </br>
+                    <input type="radio" name="adherence" value="no"> Absolutely not </br>
+                    <input type="submit" value="Submit">
+                </form>
+                <br>
+
+           <button name="testButtonB" onClick="testLocalNote()">fire note</button>
+           <button name="testButtonC" onClick="resendPayloads()">send local data</button></br>
+           <button name="testButtonD" onClick="checkWisepillStatus()">wisepill status</button>
+
+        </div>
+
+        <script src="js/jquery-1.11.2.js"></script>
+
+        <script type="text/javascript" charset="utf-8">
+
+            // uses the local notification plugin to schedule a local note
+            // date param schedules time in the future to fire
+
+            function testLocalNote()
+            {
+                alert('local note fired');
+
+                window.plugin.notification.local.add({
+                id: 2,
+                date: new Date(new Date().getTime() + 60*1000),
+                badge: 1,
+                message: 'Tell us more about your medications.',
+                title: 'Test from Button Click',
+                repeat: '',
+                });
+            }
+
+        </script>
+
+        <script type="text/javascript" charset="utf-8">
+
+          function checkWisepillStatus() {
+
+            var today = getTodayDate();
+
+              var wisepillCheck = $.ajax({
+
+                // id_code will be based on user settings
+                url: "http://localhost:3000/wisepill?id_code=1234",
+                type: 'GET',
+                dataType:'text',
+
+                success: function(data){
+
+                    wisePillData = JSON.parse(data);
+
+                    console.log("wisepill opened? " + wisePillData['wasPillboxOpenedToday'])
+
+                    if (wisePillData['wasPillboxOpenedToday'] == false && wisePillData['today'] == today){
+
+                      // todo handle medication time logic
+
+                      alert("wisepill note fired");
+
+                      window.plugin.notification.local.add({
+                        id: 3,
+                        date: new Date(new Date().getTime() + 60*1000),
+                        badge: 1,
+                        message: 'Tell us more about your medications.',
+                        title: 'Based on Wisepill response.',
+                        repeat: '',
+                      });
+
+                    }
+
+                    // i dunno that we even need to store this unless for events
+                    var now = new Date(new Date().getTime()).toString();
+                    wiseDataDateTag = 'wisepill ' + now;
+                    window.localStorage.setItem(wiseDataDateTag, wisePillData);
+
+                    },
+
+                    error: function(){
+
+                      console.log('could not get wisepill status');
+
+                    },
+            });
+          }
+
+        function getTodayDate() {
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth()+1;
+            var yyyy = today.getFullYear();
+
+            if(dd<10) {
+              dd='0'+dd
+            }
+
+            if(mm<10) {
+              mm='0'+mm
+            }
+
+            today = yyyy+'-'+mm+'-'+dd;
+            return today;
+
+          }
+
+      </script>
+
+      <script type="text/javascript" charset="utf-8">
+
+        function sendPayload()  {
+
+          var form = $(document.q1a);
+          var response = JSON.stringify(form.serializeArray());
+
+          var now = new Date(new Date().getTime()).toString();
+
+          // semi-static test payload
+          var sampleData = {
+            "participant_id": "test - " + now,
+            "prompt": "12",
+            "response": response};
+
+            var medData = JSON.stringify(sampleData);
+
+            var report = $.ajax({
+              url: 'http://localhost:3000/reports.json',
+              type: 'POST',
+              contentType:'application/json',
+              data: medData,
+
+              // currently success callback not firing even tho
+              // payload is stored on local rails server
+              // and error response fails to trip
+              // seems to be part of cors suite of annoyances
+              success: function(){
+
+                alert("data sent. thanks for letting us know!");
+
+              },
+
+              // add payload to local storage to post later
+              error: function(){
+
+                payloadDateTag = 'payload' + now;
+
+                // in backbone implementation store these under 'adherence' namespace
+
+                window.localStorage.setItem(payloadDateTag, medData);
+                alert("we stored your data to send later.");
+
+              },
+
+            });
+
+          }
+
+          </script>
+
+        <script type="text/javascript">
+
+          function resendPayloads(){
+
+            // grab each item in local storage
+            // todo: resolve success response issue
+            for (var i in window.localStorage){
+
+              storedPayload = localStorage.getItem(i);
+              storedItemKey = localStorage.key(i);
+
+              // in backbone implementation retrieve these from 'adherence' namespace
+
+              console.log(storedPayload.toString());
+
+              // attempt to send item to the server
+
+              var resend = $.ajax({
+                url: 'http://localhost:3000/reports.json',
+                type: 'POST',
+                contentType:'application/json',
+                data: storedPayload,
+
+                // success not getting registered
+                success: function(){
+
+                  // remove stored item from localstorage
+                  window.localStorage.removeItem(storedItemKey);
+
+                },
+
+                error: function(){
+
+                  // item placed back in local storage for next attempt
+                  // note actual reported timestamp will be in payload itself
+                  var now = new Date(new Date().getTime()).toString();
+                  payloadDateTag = 'payload' + now;
+
+                  window.localStorage.setItem(payloadDateTag, storedPayload);
+                  console.log( storedItemKey + ' still not posted to server');
+
+                },
+              });
+
+              // this should get moved into the success fn once i debug
+              window.localStorage.removeItem(storedItemKey);
+
+            }
+
+        }
+
+        </script>
+
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="Launcher.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+
+    </body>
+</html>
