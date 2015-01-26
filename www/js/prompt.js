@@ -36,11 +36,11 @@
     el: $('form'),
 
     events: {
-      'submit' : 'showNextPrompt',
+
     },
 
     initialize: function(){
-      _.bindAll(this, 'render', 'showNextPrompt');
+      _.bindAll(this, 'render');
     },
 
     // render a form for a single prompt
@@ -50,26 +50,24 @@
       return this;
     },
 
-    showNextPrompt: function(){
-
-      // based on the user response
-      // and the current prompt id
-      // show them the next prompt or
-      // give feedback
-
-    }
-
   });
 
   var AdherenceView = Backbone.View.extend({
     el: $('body'),
 
     events: {
-      'submit' : 'postAdherenceResponse',
+      'submit' : function(e) {
+        this.postAdherenceResponse(e);
+        this.showNextPrompt(e);
+      }
+
     },
 
     initialize: function(){
-      _.bindAll(this, 'render', 'postAdherenceResponse');
+      _.bindAll(this, 'render', 'postAdherenceResponse', 'showNextPrompt');
+
+      this.collection = new PromptSet();
+      // this.collection.bind('add', this.appendItem); // collection event binder
 
       this.render();
     },
@@ -78,7 +76,8 @@
 
       var prompt = new Prompt();
 
-      // todo: populate from set of prompt values
+      // todo: set these in showNextPrompt
+      // or figure out where to set these in general
       prompt.set({
 
         prompt_id: 'q1a',
@@ -86,7 +85,8 @@
 
       });
 
-      // build a form for the prompt
+      this.collection.add(prompt);
+
       var promptView = new PromptView({
         model: prompt
       });
@@ -95,11 +95,25 @@
 
     },
 
+    showNextPrompt: function(){
+
+      // based on the user response
+      // and the current prompt id
+      // show them the next prompt or
+      // give feedback
+
+      prompt.set({
+        prompt_id: 'q2a',
+        questionText: 'Do you plan to take your medication?',
+      });
+
+    },
+
     postAdherenceResponse: function(){
 
       // how to grab this id when i create the prompt in a different fn?
-      // var prompt_id = this.model.get('prompt_id');
-      var prompt_id = 'q1a';
+      var prompt_id = this.model.get('prompt_id');
+      // var prompt_id = 'q1a';
 
       var form = $(document.base);
       var answer = JSON.stringify(form.serializeArray());
@@ -109,7 +123,7 @@
 
       promptResponse.set({
 
-        prompt: prompt_id,
+        prompt_id: prompt_id,
         response: answer,
 
       });
