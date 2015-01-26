@@ -1,10 +1,25 @@
 (function($){
 
+  var Prompt = Backbone.Model.extend({
+
+    defaults: {
+      "prompt_id": '', // ids correspond to prompt flow diagram
+      "questionText" : '',
+    }
+
+  });
+
+  var PromptSet = Backbone.Collection.extend({
+
+    model: Prompt
+
+  });
+
   var PromptResponse = Backbone.Model.extend({
 
     defaults: {
       "participant_id": "test - " + new Date(new Date().getTime()).toString(),
-      "prompt": "q1a",
+      "prompt_id": '',
       "response": '',
     },
 
@@ -17,8 +32,36 @@
 
   });
 
-
   var PromptView = Backbone.View.extend({
+    el: $('form'),
+
+    events: {
+      'submit' : 'showNextPrompt',
+    },
+
+    initialize: function(){
+      _.bindAll(this, 'render', 'showNextPrompt');
+    },
+
+    // render a form for a single prompt
+    render: function(){
+
+      $('body').append('<p>' + this.model.get('questionText') + '</p>');
+      return this;
+    },
+
+    showNextPrompt: function(){
+
+      // based on the user response
+      // and the current prompt id
+      // show them the next prompt or
+      // give feedback
+
+    }
+
+  });
+
+  var AdherenceView = Backbone.View.extend({
     el: $('body'),
 
     events: {
@@ -26,36 +69,51 @@
     },
 
     initialize: function(){
-      _.bindAll(this, 'render', 'addPromptResponse','postAdherenceResponse');
-
-      this.collection = new AdherenceResponse();
-      this.collection.bind('submit', this.addPromptResponse);
+      _.bindAll(this, 'render', 'postAdherenceResponse');
 
       this.render();
     },
 
     render: function(){
 
-      // eventually we'll build forms from a collection of prompts
+      var prompt = new Prompt();
 
-      $(this.el).append("<p>prompt text</p>");
-      $(this.el).append("<form name='q1a'><input type='radio' name='adherence' value='yes'> Yep </br><input type='radio' name='adherence' value='no'> Absolutely not </br><input id='q1aSubmit' type='submit' value='submit'></form>");
-    },
+      // todo: populate from set of prompt values
+      prompt.set({
 
-    addPromptResponse: function(){
+        prompt_id: 'q1a',
+        questionText: 'Did you take your medication today?',
+
+      });
+
+      // build a form for the prompt
+      var promptView = new PromptView({
+        model: prompt
+      });
+
+      $(this.el).append(promptView.render().el);
 
     },
 
     postAdherenceResponse: function(){
 
-      var form = $(this.q1a);
+      // how to grab this id when i create the prompt in a different fn?
+      // var prompt_id = this.model.get('prompt_id');
+      var prompt_id = 'q1a';
+
+      var form = $(document.base);
       var answer = JSON.stringify(form.serializeArray());
 
-      // semi-static test payload
+      // todo build aherence response hash based on successive prompts
       var promptResponse = new PromptResponse();
-      promptResponse.response = answer;
 
-      // todo: put the prompt response into collection, send that instead
+      promptResponse.set({
+
+        prompt: prompt_id,
+        response: answer,
+
+      });
+
       var adherenceResponse = JSON.stringify(promptResponse);
 
       var report = $.ajax({
@@ -75,20 +133,26 @@
         // add payload to local storage to post later
         error: function(){
 
-          payloadDateTag = 'payload' + new Date(new Date().getTime()).toString();
+          payloadDateTag = 'adherence: ' + new Date(new Date().getTime()).toString();
 
-          // in backbone implementation store these under 'adherence' namespace
-
+          // todo store these under 'adherence' namespace
           window.localStorage.setItem(payloadDateTag, adherenceResponse);
           alert("we stored your data to send later.");
 
         },
 
-        });
+      });
+    },
+
+
+    addPromptResponse: function(){
+
+      // for multiple stage responses, concatenate into one payload
+
     },
 
   });
 
-  var promptView = new PromptView();
+  var adherenceView = new AdherenceView();
 
 })(jQuery);
