@@ -7,7 +7,6 @@ define([
   'collections/prompts',
   ], function($, _, Backbone, Prompt, Prompts, PromptResponse){
 
-
   // call all of the init fn here
   var initialize = function(){
 
@@ -33,21 +32,22 @@ define([
       _.bindAll(this, 'render', 'postAdherenceResponse', 'showNextPrompt', 'fireReminderNote');
 
       // placeholder prompts to eventually draw from as part of the prompt flow
-      questions = new Prompts([
+      var questions = new Prompts();
+
+      questions.add([
         { id: 1, prompt_id: "q1a", questionText: "Did you take your medication today?"},
         { id: 2, prompt_id: "q2a", questionText: "Do you plan to take your medication today?"},
         { id: 3, prompt_id: "q2b", questionText: "Will you ever take your medication agian?"},
         ]);
 
-
       // this.collection.bind('add', this.appendItem); // collection event binder
-
       this.render();
+
     },
 
     render: function(){
 
-      currentPrompt = questions.get(1);
+      var currentPrompt = this.questions.get(1);
 
       $(this.el).append('<p>' + this.currentPrompt.get('questionText') + '</p>');
 
@@ -57,7 +57,7 @@ define([
 
       // based on the user response
       // and the current prompt id
-      // show them the next prompt or
+      // show them the next appropriate prompt or
       // give feedback
 
     },
@@ -66,7 +66,9 @@ define([
 
       var form = $(document.base);
 
+      // placeholder until i do the multiple prompt stuff
       var currentPrompt = questions.get(1);
+
       var prompt_id = currentPrompt.get('prompt_id');
       var answer = $( "input:radio:checked" ).val();
 
