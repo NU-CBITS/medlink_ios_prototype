@@ -1,3 +1,5 @@
+var app = app || {};
+
 define([
   'underscore',
   'backbone',

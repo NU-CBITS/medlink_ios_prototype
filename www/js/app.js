@@ -4,17 +4,23 @@ define([
   'backbone',
   'models/prompt',
   'models/prompt_response',
-  'collections/prompts',
-  ], function($, _, Backbone, Prompt, Prompts, PromptResponse){
+  ], function($, _, Backbone, Prompt, PromptResponse){
 
-  // call all of the init fn here
+    var myapp = {};
+
+    myapp.questions = new Backbone.Collection();
+
+    myapp.questions.add([
+      { id: 1, prompt_id: "q1a", questionText: "Did you take your medication today?"},
+      { id: 2, prompt_id: "q2a", questionText: "Do you plan to take your medication today?"},
+      { id: 3, prompt_id: "q2b", questionText: "Will you ever take your medication agian?"},
+      ]);
+
+
   var initialize = function(){
 
-      Prompt.initialize();
+    // call all of the init fn here
 
-    return {
-      initialize: initialize
-    };
   };
 
   var AdherenceView = Backbone.View.extend({
@@ -31,15 +37,6 @@ define([
     initialize: function(){
       _.bindAll(this, 'render', 'postAdherenceResponse', 'showNextPrompt', 'fireReminderNote');
 
-      // placeholder prompts to eventually draw from as part of the prompt flow
-      var questions = new Prompts();
-
-      questions.add([
-        { id: 1, prompt_id: "q1a", questionText: "Did you take your medication today?"},
-        { id: 2, prompt_id: "q2a", questionText: "Do you plan to take your medication today?"},
-        { id: 3, prompt_id: "q2b", questionText: "Will you ever take your medication agian?"},
-        ]);
-
       // this.collection.bind('add', this.appendItem); // collection event binder
       this.render();
 
@@ -47,9 +44,9 @@ define([
 
     render: function(){
 
-      var currentPrompt = this.questions.get(1);
+      var currentPrompt = myapp.questions.get(1);
 
-      $(this.el).append('<p>' + this.currentPrompt.get('questionText') + '</p>');
+      $(this.el).append('<p>' + currentPrompt.get('questionText') + '</p>');
 
     },
 
