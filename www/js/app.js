@@ -1,99 +1,158 @@
-requirejs.config({
-  shim: {
-    "backbone": {
-      deps: ["lodash", "jquery"],
-      exports: "Backbone"
+define([
+  'jquery',
+  'underscore',
+  'backbone',
+  'models/prompt',
+  'models/prompt_response',
+  'collections/prompts',
+  ], function($, _, Backbone, Prompt, Prompts, PromptResponse){
+
+
+  // call all of the init fn here
+  var initialize = function(){
+
+      Prompt.initialize();
+
+    return {
+      initialize: initialize
+    };
+  };
+
+  var AdherenceView = Backbone.View.extend({
+    el: $('body'),
+
+    events: {
+      'submit' : function(e) {
+        this.postAdherenceResponse(e);
+        this.showNextPrompt(e);
+      }
+
     },
-    "bootstrap": {
-      deps: ["jquery"],
-      exports: "Bootstrap"
+
+    initialize: function(){
+      _.bindAll(this, 'render', 'postAdherenceResponse', 'showNextPrompt', 'fireReminderNote');
+
+      // placeholder prompts to eventually draw from as part of the prompt flow
+      questions = new Prompts([
+        { id: 1, prompt_id: "q1a", questionText: "Did you take your medication today?"},
+        { id: 2, prompt_id: "q2a", questionText: "Do you plan to take your medication today?"},
+        { id: 3, prompt_id: "q2b", questionText: "Will you ever take your medication agian?"},
+        ]);
+
+
+      // this.collection.bind('add', this.appendItem); // collection event binder
+
+      this.render();
+    },
+
+    render: function(){
+
+      currentPrompt = questions.get(1);
+
+      $(this.el).append('<p>' + this.currentPrompt.get('questionText') + '</p>');
+
+    },
+
+    showNextPrompt: function(){
+
+      // based on the user response
+      // and the current prompt id
+      // show them the next prompt or
+      // give feedback
+
+    },
+
+    postAdherenceResponse: function(){
+
+      var form = $(document.base);
+
+      var currentPrompt = questions.get(1);
+      var prompt_id = currentPrompt.get('prompt_id');
+      var answer = $( "input:radio:checked" ).val();
+
+      // todo build aherence response hash based on successive prompts
+      var promptResponse = new PromptResponse();
+
+      promptResponse.set({
+
+        prompt_id: prompt_id,
+        response: answer,
+
+      });
+
+      var adherenceResponse = JSON.stringify(promptResponse);
+
+      var report = $.ajax({
+        url: 'http://localhost:3000/reports.json',
+        type: 'POST',
+        contentType:'application/json',
+        data: adherenceResponse,
+
+        // currently success callback not firing
+        // seems to be part of cors suite of annoyances
+        success: function(){
+
+          alert("data sent. thanks for letting us know!");
+
+        },
+
+        // add payload to local storage to post later
+        error: function(){
+
+          payloadDateTag = 'adherence: ' + new Date(new Date().getTime()).toString();
+
+          window.localStorage.setItem(payloadDateTag, adherenceResponse);
+          alert("we stored your data to send later.");
+
+        },
+
+      });
+
+
+      if (answer.toString() === "no") {
+
+        alert('local note fired');
+
+        // comment out if not working in cordova
+        /*
+        window.plugin.notification.local.add({
+        id: 2,
+        date: new Date(new Date().getTime() + 60*1000),
+        badge: 1,
+        message: 'Tell us more about your medications.',
+        title: 'Based on response of no',
+        repeat: '',
+      });
+      */
+
+      // want to do this instead:
+      // this.fireReminderNote();
+
     }
+
   },
-  paths: {
-    bootstrap: "vendor/bootstrap-3.0.0.min",
-    backbone: "vendor/backbone-1.1.0.min",
-    jquery: "vendor/jquery-2.0.3.min",
-    lodash: "vendor/lodash-1.3.1.min",
-    text: "vendor/text-2.0.10",
-    localstorage: "vendor/backbone.localStorage-1.1.6.min",
-    fastclick: "vendor/fastclick-0.6.9.min",
-    moment: "vendor/moment-2.4.0.min",
-  }
+
+  // schedule a reminder notification 1 minutes in the future
+  fireReminderNote: function(){
+
+    window.plugin.notification.local.add({
+      id: 2,
+      date: new Date(new Date().getTime() + 60*1000),
+      badge: 1,
+      message: 'Tell us more about your medications.',
+      title: 'Based on response of no',
+      repeat: '',
+    });
+  },
+
+  addPromptResponse: function(){
+
+    // for multiple stage responses, concatenate into one payload
+
+  },
+
 });
 
-(function() {
-  var appView = null;
+var adherenceView = new AdherenceView();
 
-  define([
-    "backbone",
-    "bootstrap",
-    "router",
-    "views/app-view",
-    "models/settings",
-    "collections/adherence-values"
-  ], function(Backbone, Bootstrap, router, AppView, settings, adherenceValues) {
-    if (window.MedLink && window.MedLink.Settings) {
-      settings.setConfigUrlBase(window.MedLink.Settings.participantConfigurationUrl);
-    }
-
-    document.addEventListener("deviceready", onDeviceReady, false);
-    document.addEventListener("resume", onDeviceReady, false);
-    document.addEventListener("backbutton", function() {
-      if ($('#assessment-view').length === 1) {
-        return false;
-      } else {
-        navigator.app.backHistory();
-      }
-    });
-
-    if (typeof cordova === "undefined") {
-      onDeviceReady();
-    }
-
-    function onDeviceReady() {
-      if (appView === null) {
-        $('#main').html('<h2>Fetching participant ID...</h2>');
-      }
-
-      settings.fetchParticipantId({
-        done: function() {
-          adherenceValues.handleResponse()
-            .done(function(adherenceCode) {
-              console.log('MedLink adherence code: ' + adherenceCode[0].payload);
-              if (adherenceCode[0].payload === "responseTrue") {
-                var messages = [
-                  { title: "Excellent!", body: "You are on track." },
-                  { title: "Great!", body: "Thanks for letting us know." }
-                ];
-                var message = messages[_.random(0, messages.length - 1)];
-                navigator.notification.alert(message.body, (function() {}), message.title);
-              } else if (adherenceCode[0].payload === "responseFalse") {
-                navigator.notification.alert("Thanks for letting us know.", (function() {}), "Ok");
-              }
-
-              if (appView === null) {
-                $('#main').html('');
-                appView = new AppView({ router: router });
-              }
-
-              try {
-                Backbone.history.start({ root: window.location.pathname });
-              }
-              catch (e) {
-                console.log("history already started");
-                //Backbone.history.location.reload();
-              }
-              settings.setFontSize();
-            })
-            .fail(function() {
-              setTimeout(onDeviceReady, 5000);
-              $('#main').html('<h2>There was an issue, retrying in 5 seconds.</h2>');
-            });
-        },
-        fail: function() {
-          $('#main').html('<h2>Please configure your user id.</h2>');
-        }
-      });
-    }
-  });
-})();
+});

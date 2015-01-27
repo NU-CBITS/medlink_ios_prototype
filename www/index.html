@@ -7,22 +7,24 @@
 </head>
 <body class="app">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script>
-<script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+<script src="js/vendor/jquery-2.0.3.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+<script src="js/vendor/backbone.js"></script>
+<script data-main="js/main" src="js/vendor/require.js"></script>
 
-<script src="js/prototyping.js"></script>
+<!-- ignore for now, where is cordova.js anyway?
+<script type="text/javascript" src="cordova.js"></script>
+
+<script type="text/javascript" src="Launcher.js"></script>
+-->
+
+<script type="text/javascript" src="js/index.js"></script>
 
 <form name='base'>
   <input type='radio' name='adherence' value='yes'> Yep </br>
   <input type='radio' name='adherence' value='no'> Absolutely not </br>
   <input id='submit' type='submit' value='submit'></form>
 </form>
-
-<script type="text/javascript" src="cordova.js"></script>
-<script type="text/javascript" src="Launcher.js"></script>
-<script type="text/javascript" src="js/index.js"></script>
 
 
 </body>

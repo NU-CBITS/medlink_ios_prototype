@@ -1,4 +1,8 @@
-define(["backbone"], function(Backbone) {
+define([
+  'underscore',
+  'backbone',
+  ], function(_, Backbone){
+    
   var AdherenceResponse = Backbone.Model.extend({
 
     defaults: {
@@ -9,4 +13,5 @@ define(["backbone"], function(Backbone) {
   });
 
   return AdherenceResponse;
+
 });

@@ -3,14 +3,14 @@
   var Prompt = Backbone.Model.extend({
 
     defaults: {
-      "id": '1234',
+      "id": 139,
       "prompt_id": '', // prompt_ids correspond to prompt flow diagram
       "questionText" : '',
     }
 
   });
 
-  var PromptSet = Backbone.Collection.extend({
+  var Prompts = Backbone.Collection.extend({
 
     model: Prompt
 
@@ -74,7 +74,7 @@
     initialize: function(){
       _.bindAll(this, 'render', 'postAdherenceResponse', 'showNextPrompt', 'fireReminderNote');
 
-      this.collection = new PromptSet();
+      this.collection = new Prompts();
       // this.collection.bind('add', this.appendItem); // collection event binder
 
       this.render();
